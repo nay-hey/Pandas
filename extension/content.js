@@ -4,7 +4,8 @@
     // Select all product items
     
     const productItems = document.querySelectorAll(".pla-unit");
-    console.log("Found product items:", productItems.length);
+    console.log("Found product items:", productItems);
+    
 
     // Map through product items and extract details
     const products = Array.from(productItems).map((item, index) => {
@@ -12,9 +13,16 @@
 
         // Extract details
         let name = "No name";
-        const nameElement = item.querySelector(".bXPcId.pymv4e.eAF8mc");
+        const nameElement = 
+            item.querySelector(".bXPcId.pymv4e.eAF8mc") || // Primary selector
+            item.firstElementChild ||                     // Fallback: First child
+            item;                                         // Fallback: Whole item
+
         if (nameElement) {
-            name = nameElement.getAttribute("aria-label") || nameElement.innerText || "No name";
+            const rawText = nameElement.innerText || "";  // Get `innerText` of the element
+            // Use regex or split to isolate the name
+            const nameMatch = rawText.split("\n")[0].trim(); // Assuming name is the first line
+            name = nameMatch || "No name";
         }
 
         const price = item.innerText.match(/₹[\d,]+/)?.[0] || "No price";
