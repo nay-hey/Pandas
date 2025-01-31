@@ -28,7 +28,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                         sendResponse({ status: "error", message: "Failed to inject content script" });
                         return;
                     }
-                    console.log("Content script injected successfully");
+            
+                    console.log("Script injection results:", results);
+                    if (results[0]) {
+                        console.log("Result from content.js:", results[0].result || "No result returned");
+                    } else {
+                        console.error("No result returned from content.js");
+                    }
                     sendResponse({ status: "success", message: "Scraping initiated" });
                 }
             );

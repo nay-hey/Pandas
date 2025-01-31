@@ -5,10 +5,15 @@
     "permissions": ["activeTab", "scripting"],
     "host_permissions": ["http://*/*", "https://*/*"],
     "action": {
-      "default_popup": "popup.html"
+        "default_popup": "popup.html"
     },
     "background": {
-      "service_worker": "background.js"
-    }
-  }
-  
+        "service_worker": "background.js"
+    },
+    "web_accessible_resources": [
+        {
+            "resources": ["content.js"],
+            "matches": ["<all_urls>"]
+        }
+    ]
+}
