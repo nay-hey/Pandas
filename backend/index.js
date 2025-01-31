@@ -1,72 +1,38 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const axios = require("axios");
-const puppeteer = require("puppeteer");
+const bodyParser = require("body-parser");
+const cors = require("cors");
 
 const app = express();
 const PORT = 3000;
 
+// Enable CORS
+app.use(cors());
 app.use(bodyParser.json());
 
-// Endpoint to process scraped data
+// Endpoint for processing data
 app.post("/process", async (req, res) => {
-    const products = req.body;
+    const products = req.body.products || [];
 
-    // Filter products by cheapest and best rating
-    const filtered = products
-        .filter(product => product.price) // Ensure price is available
-        .sort((a, b) => parseFloat(a.price.replace("$", "")) - parseFloat(b.price.replace("$", ""))); // Sort by price
-
-    // Call Gemini API (example)
-    try {
-        const response = await axios.post("https://your-gemini-api-endpoint.com/process", { products: filtered });
-        res.json(response.data);
-    } catch (error) {
-        console.error("Error calling Gemini API:", error);
-        res.status(500).send("Error processing data");
+    if (!Array.isArray(products) || products.length === 0) {
+        console.error("No products received or invalid data format");
+        return res.status(400).json({ error: "No products received or invalid data format." });
     }
-});
 
-// Run Puppeteer for seasonal trends (example endpoint)
-const puppeteer = require("puppeteer");
+    console.log("Received products:", products);
 
-// Seasonal trends scraping endpoint
-app.get("/trend-analysis", async (req, res) => {
-    try {
-        const query = req.query.q || "seasonal sales 2025"; // Example query
-        const googleSearchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+    // Process the products (e.g., filter, sort, or call external APIs)
+    const filteredProducts = products
+        .filter(product => product.price)
+        .sort((a, b) => parseFloat(a.price.replace("$", "")) - parseFloat(b.price.replace("$", "")));
 
-        const browser = await puppeteer.launch({
-            headless: true, // Run in headless mode
-            args: ["--no-sandbox", "--disable-setuid-sandbox"], // Sandbox args for production environments
-        });
-        const page = await browser.newPage();
+    console.log("Filtered products:", filteredProducts);
 
-        // Navigate to Google search
-        await page.goto(googleSearchUrl, { waitUntil: "domcontentloaded" });
-
-        // Wait for search results to load
-        await page.waitForSelector("div.tF2Cxc"); // Google search result selector
-
-        // Scrape search results
-        const results = await page.evaluate(() => {
-            return Array.from(document.querySelectorAll("div.tF2Cxc")).map((result) => {
-                const title = result.querySelector("h3")?.innerText || "No title";
-                const link = result.querySelector("a")?.href || "No link";
-                const snippet = result.querySelector(".VwiC3b")?.innerText || "No snippet";
-                return { title, link, snippet };
-            });
-        });
-
-        await browser.close();
-        res.json({ query, results });
-    } catch (error) {
-        console.error("Puppeteer error:", error);
-        res.status(500).send("Error fetching Google trends");
-    }
+    res.json({ success: true, filteredProducts });
 });
 
 
+// Start the server
 app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
+    console.log(`Backend server running at http://localhost:${PORT}`);
 });

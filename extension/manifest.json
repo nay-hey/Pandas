@@ -1,21 +1,14 @@
 {
     "manifest_version": 3,
-    "name": "Smart Price Predictor",
+    "name": "Price Scraper Extension",
     "version": "1.0",
-    "description": "Scrapes Google search results and predicts the best time to buy.",
-    "permissions": ["activeTab", "scripting", "storage"],
-    "host_permissions": ["https://*/*", "http://*/*"],
-    "background": {
-      "service_worker": "background.js"
-    },
-    "content_scripts": [
-      {
-        "matches": ["https://www.google.com/search*"],
-        "js": ["content.js"]
-      }
-    ],
+    "permissions": ["activeTab", "scripting"],
+    "host_permissions": ["http://*/*", "https://*/*"],
     "action": {
       "default_popup": "popup.html"
+    },
+    "background": {
+      "service_worker": "background.js"
     }
   }
   
