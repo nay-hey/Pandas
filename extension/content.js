@@ -12,18 +12,13 @@
         console.log(`Processing item ${index + 1}:`, item);
 
         // Extract details
-        let name = "No name";
-        const nameElement = 
-            item.querySelector(".bXPcId.pymv4e.eAF8mc") || // Primary selector
-            item.firstElementChild ||                     // Fallback: First child
-            item;                                         // Fallback: Whole item
-
-        if (nameElement) {
-            const rawText = nameElement.innerText || "";  // Get `innerText` of the element
-            // Use regex or split to isolate the name
-            const nameMatch = rawText.split("\n")[0].trim(); // Assuming name is the first line
-            name = nameMatch || "No name";
-        }
+        
+    // Extract name from `innerText`
+    let name = "No name";
+    const rawText = item.innerText || ""; // Get the full text content of the item
+    if (rawText) {
+        name = rawText.split("\n")[0].trim(); // Extract the first line as the name
+    }
 
         const price = item.innerText.match(/₹[\d,]+/)?.[0] || "No price";
         const merchant = item.dataset.dtld || "No merchant";
