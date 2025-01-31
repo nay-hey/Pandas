@@ -1,16 +1,34 @@
 (async () => {
-    console.log("Content script running");
+    console.log("Content script running...");
 
-    // Example: Scrape product data from a search result page
-    const products = Array.from(document.querySelectorAll(".product-item")).map((item) => ({
-        name: item.querySelector(".product-name")?.innerText || "No name",
-        price: item.querySelector(".product-price")?.innerText || "No price",
-        rating: item.querySelector(".product-rating")?.innerText || "No rating",
-    }));
+    // Select all product items
+    
+    const productItems = document.querySelectorAll(".pla-unit");
+    console.log("Found product items:", productItems.length);
+
+    // Map through product items and extract details
+    const products = Array.from(productItems).map((item, index) => {
+        console.log(`Processing item ${index + 1}:`, item);
+
+        // Extract details
+        let name = "No name";
+        const nameElement = item.querySelector(".bXPcId.pymv4e.eAF8mc");
+        if (nameElement) {
+            name = nameElement.getAttribute("aria-label") || nameElement.innerText || "No name";
+        }
+
+        const price = item.innerText.match(/₹[\d,]+/)?.[0] || "No price";
+        const merchant = item.dataset.dtld || "No merchant";
+        const freeDelivery = item.innerText.includes("Free delivery") ? "Free delivery" : "No free delivery";
+        const image = item.querySelector("img")?.src || "No image";
+
+        console.log({ name, price, merchant, freeDelivery, image });
+        return { name, price, merchant, freeDelivery, image };
+    });
 
     console.log("Scraped Products:", products);
 
-    // Send scraped data to the backend
+    // Send the scraped data to the backend
     try {
         const response = await fetch("http://localhost:3000/process", {
             method: "POST",
@@ -22,6 +40,13 @@
 
         const result = await response.json();
         console.log("Processed Results:", result);
+        chrome.runtime.sendMessage({ action: "processedResults", data: result }, (response) => {
+            if (chrome.runtime.lastError) {
+                console.error("Error sending processed results to background:", chrome.runtime.lastError.message);
+            } else {
+                console.log("Processed results sent to background:", response.message);
+            }
+        });
     } catch (error) {
         console.error("Error sending data to backend:", error);
     }

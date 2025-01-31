@@ -15,32 +15,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
                 sendResponse({ status: "error", message: "No active tab available" });
                 return;
             }
+            const tabId = tabs[0].id;
+            console.log("Active tab found. Tab ID:", tabId);
 
             // Inject content.js into the active tab
             chrome.scripting.executeScript(
                 {
-                    target: { tabId: tabs[0].id },
+                    target: { tabId },
                     files: ["content.js"],
                 },
-                (results) => {
+                () => {
                     if (chrome.runtime.lastError) {
                         console.error("Error injecting content script:", chrome.runtime.lastError.message);
-                        sendResponse({ status: "error", message: "Failed to inject content script" });
-                        return;
-                    }
-            
-                    console.log("Script injection results:", results);
-                    if (results[0]) {
-                        console.log("Result from content.js:", results[0].result || "No result returned");
+                        sendResponse({ status: "error", message: chrome.runtime.lastError.message });
                     } else {
-                        console.error("No result returned from content.js");
+                        console.log("Content script executed successfully");
+                        sendResponse({ status: "success", message: "Scraping initiated" });
                     }
-                    sendResponse({ status: "success", message: "Scraping initiated" });
                 }
             );
+            
         });
 
         // Return true to indicate that the response will be sent asynchronously
         return true;
+    }
+    if (message.action === "processedResults") {
+        console.log("Received processed results from content script:", message.data);
+
+        // Optionally send data to the popup or store it
+        sendResponse({ status: "success", message: "Processed results received", data: message.data });
     }
 });

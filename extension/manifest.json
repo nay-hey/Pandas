@@ -2,18 +2,20 @@
     "manifest_version": 3,
     "name": "Price Scraper Extension",
     "version": "1.0",
+    "description": "Scrape product prices from websites.",
     "permissions": ["activeTab", "scripting"],
-    "host_permissions": ["http://*/*", "https://*/*"],
+    "host_permissions": ["<all_urls>"],
     "action": {
         "default_popup": "popup.html"
     },
     "background": {
         "service_worker": "background.js"
     },
-    "web_accessible_resources": [
+    "content_scripts": [
         {
-            "resources": ["content.js"],
-            "matches": ["<all_urls>"]
+            "matches": ["<all_urls>"],
+            "js": ["content.js"],
+            "run_at": "document_idle"
         }
     ]
 }

@@ -23,8 +23,10 @@ app.post("/process", async (req, res) => {
 
     // Process the products (e.g., filter, sort, or call external APIs)
     const filteredProducts = products
-        .filter(product => product.price)
-        .sort((a, b) => parseFloat(a.price.replace("$", "")) - parseFloat(b.price.replace("$", "")));
+    // Ensure price is valid
+    .filter(product => product.price && !isNaN(parseFloat(product.price.replace(/[₹$,]/g, "").replace(",", ""))))
+    // Sort products by numeric price (ascending)
+    .sort((a, b) => parseFloat(a.price.replace(/[₹$,]/g, "").replace(",", "")) - parseFloat(b.price.replace(/[₹$,]/g, "").replace(",", "")));
 
     console.log("Filtered products:", filteredProducts);
 

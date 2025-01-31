@@ -2,9 +2,32 @@
 <html>
 <head>
     <title>Price Scraper</title>
+    <style>
+        #product-list {
+            margin-top: 20px;
+        }
+
+        .product-item {
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+
+        .product-name {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+
+        .product-price {
+            color: green;
+            font-weight: bold;
+        }
+    </style>
 </head>
 <body>
     <button id="scrape-button">Scrape Products</button>
+    <div id="product-list"></div>
     <script src="popup.js"></script>
 </body>
 </html>
