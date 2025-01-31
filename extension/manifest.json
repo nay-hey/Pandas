@@ -1,0 +1,21 @@
+{
+    "manifest_version": 3,
+    "name": "Smart Price Predictor",
+    "version": "1.0",
+    "description": "Scrapes Google search results and predicts the best time to buy.",
+    "permissions": ["activeTab", "scripting", "storage"],
+    "host_permissions": ["https://*/*", "http://*/*"],
+    "background": {
+      "service_worker": "background.js"
+    },
+    "content_scripts": [
+      {
+        "matches": ["https://www.google.com/search*"],
+        "js": ["content.js"]
+      }
+    ],
+    "action": {
+      "default_popup": "popup.html"
+    }
+  }
+  
