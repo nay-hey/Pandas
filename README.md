@@ -12,7 +12,7 @@ A web extension that helps users compare product prices across multiple websites
 #### 1. Clone the Repository
 Run the following command in your terminal:
 bash
-git clone https://github.com/nay-hey/soi_webdev.git
+git clone [https://github.com/nay-hey/Pandas.git](https://github.com/nay-hey/Pandas.git)
 
 Alternatively, you can download the repository as a .zip file and extract it.
 
