@@ -27,14 +27,14 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const productDiv = document.createElement("div");
       productDiv.style.marginBottom = "20px";
       productDiv.innerHTML = `
-                <p><strong>Name:</strong> ${product.name}</p>
-                <p><strong>Price:</strong> ${product.price}</p>
-                <p><strong>Merchant:</strong> ${product.merchant}</p>
-                <p><strong>Delivery:</strong> ${product.freeDelivery}</p>
-                <p><strong>Link:</strong> <a href="${product.link}" target="_blank">View Product</a></p>
-                <img src="${product.image}" alt="${product.name}" width="100">
-                <hr>
-            `;
+                  <p><strong>Name:</strong> ${product.name}</p>
+                  <p><strong>Price:</strong> ${product.price}</p>
+                  <p><strong>Merchant:</strong> ${product.merchant}</p>
+                  <p><strong>Delivery:</strong> ${product.freeDelivery}</p>
+                  <p><strong>Link:</strong> <a href="${product.link}" target="_blank">View Product</a></p>
+                  <img src="${product.image}" alt="${product.name}" width="100">
+                  <hr>
+              `;
       resultsContainer.appendChild(productDiv);
     });
 
