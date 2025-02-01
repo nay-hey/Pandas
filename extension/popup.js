@@ -51,6 +51,13 @@ function applyFilters(products) {
       );
   });
 
+  // Sort filtered products by price in ascending order
+  filteredProducts.sort((a, b) => {
+      const priceA = parseFloat(a.price.replace(/[^\d.]/g, ""));
+      const priceB = parseFloat(b.price.replace(/[^\d.]/g, ""));
+      return priceA - priceB;  // Sort in ascending order
+  });
+
   displayProducts(filteredProducts);
 }
 
@@ -92,3 +99,11 @@ document.getElementById("price-range").addEventListener("input", function () {
 document.getElementById("free-delivery-filter").addEventListener("change", () => applyFilters(allProducts));
 
 
+document.getElementById("scrape-button").addEventListener("click", () => {
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    chrome.scripting.executeScript({
+      target: { tabId: tabs[0].id },
+      files: ["content.js"],
+    });
+  });
+});
