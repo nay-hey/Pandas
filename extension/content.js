@@ -31,32 +31,32 @@
     return links;
   };
 
-  // Function to hit a link using the scraping API
-  const hitLink = async (url) => {
-    try {
-      // Base64 encode the username and API key
-      const auth = "Basic " + btoa(`${username}:${KEY}`);
+  //   // Function to hit a link using the scraping API
+  //   const hitLink = async (url) => {
+  //     try {
+  //       // Base64 encode the username and API key
+  //       const auth = "Basic " + btoa(`${username}:${KEY}`);
 
-      // Send a POST request to the scraping endpoint
-      const response = await fetch(scrapEP, {
-        method: "POST",
-        headers: {
-          Accept: "application/json",
-          "Content-Type": "application/json",
-          Authorization: auth,
-        },
-        body: JSON.stringify({ url }),
-      });
+  //       // Send a POST request to the scraping endpoint
+  //       const response = await fetch(scrapEP, {
+  //         method: "POST",
+  //         headers: {
+  //           Accept: "application/json",
+  //           "Content-Type": "application/json",
+  //           Authorization: auth,
+  //         },
+  //         body: JSON.stringify({ url }),
+  //       });
 
-      // Parse the response
-      const data = await response.json();
-      console.log("Scraping API response:", data);
-      return data;
-    } catch (error) {
-      console.error("Error fetching or parsing the page:", error);
-      return null;
-    }
-  };
+  //       // Parse the response
+  //       const data = await response.json();
+  //       console.log("Scraping API response:", data);
+  //       return data;
+  //     } catch (error) {
+  //       console.error("Error fetching or parsing the page:", error);
+  //       return null;
+  //     }
+  //   };
 
   // Main logic
   const links = getLinks();
