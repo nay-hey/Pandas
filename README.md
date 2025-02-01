@@ -33,11 +33,11 @@ We will further use trained AI models to predict and suggest the best time of th
     - Open `chrome://extensions/` in the google chrome web browser.
     - Click on the top right corner button to turn developer mode on.
     - Click on left top corner button titled "Load unpacked".
-    - Select "Pandas-main\extension" folder.
     - ![Extension](/Extensions.png)
+    - Select "Pandas-main\extension" folder from your system and upload it.
 
 4. Testing:
     - Open a google chrome tab and search for any item.
     - Click on extensions in the searchbar and select the Price Scraper Extension.
-    - ![Extension1](/Extensions.png)
+    - ![Extension1](/Extensions1.png)
     - Now you can filter and view search results from various websites.
