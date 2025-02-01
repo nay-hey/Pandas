@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <!-- Swiper.js CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
+    <!-- Swiper.js JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+
     <title>Price Scraper</title>
     <style>
         #product-list {
@@ -23,35 +29,93 @@
             color: green;
             font-weight: bold;
         }
+        .swiper-container {
+            width: 100%;
+            height: auto;
+            padding: 20px;
+        }
 
-        .loading {
-            display: none; /* Hidden by default */
+        .swiper-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .product-item {
+            width: 250px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            padding: 10px;
             text-align: center;
-            margin-top: 20px;
+            background: #fff;
         }
 
-        .loader {
-            border: 5px solid #f3f3f3;
-            border-top: 5px solid #3498db;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 2s linear infinite;
+        .product-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        #filters {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
         }
 
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        #merchant-filter,
+        #price-range {
+            margin-left: 5px;
         }
+
+        input[type="range"] {
+            width: 120px;
+        }
+
+
     </style>
 </head>
 <body>
     <button id="scrape-button">Scrape Products</button>
-    <div class="loading" id="loading">
-        <div class="loader"></div>
-        <p>Scraping data, please wait...</p>
+    <!-- Filtering Options -->
+    <div id="filters">
+        <label for="merchant-filter">Merchant:</label>
+        <select id="merchant-filter">
+            <option value="all">All</option>
+        </select>
+
+        <label for="price-range">Max Price:</label>
+        <input type="range" id="price-range" min="0" max="500" step="10" value="500">
+        <span id="price-value">500</span>
+
+        <label>
+            <input type="checkbox" id="free-delivery-filter">
+            Free Delivery Only
+        </label>
     </div>
-    <div id="product-list"></div>
+
+    <!-- Swiper Container -->
+    <div class="swiper-container">
+        <div class="swiper-wrapper" id="product-list"></div>
+   
+        <div class="swiper-pagination"></div>
+    </div>
+
+    <!-- <div id="product-list"></div> -->
+    <!-- Swiper Container -->
+
+    <!-- <div class="swiper-container">
+        <div class="swiper-wrapper" id="product-list"></div>
+        
+        
+        <div class="swiper-button-next"></div>
+        <div class="swiper-button-prev"></div>
+
+        <div class="swiper-pagination"></div>
+    </div> -->
+
     <script src="popup.js"></script>
 </body>
 </html>
