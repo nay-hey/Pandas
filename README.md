@@ -1,6 +1,6 @@
 # Financial saving extension
 
-A web extension that assists useres in viewing products from across websites and filtering them. This will help them find the most cost saving options and get the best deal.
+A web extension that assists users in viewing products from across websites and filtering them. This will help them find the most cost saving options and get the best deal.
 We will further use trained AI models to predict and suggest the best time of the year to buy items.
 
 ## How to run the code
