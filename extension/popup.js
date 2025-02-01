@@ -1,42 +1,50 @@
 document.getElementById("scrape-button").addEventListener("click", () => {
-    chrome.runtime.sendMessage({ action: "scrapeData" }, (response) => {
-        if (chrome.runtime.lastError) {
-            console.error("Error from background script:", chrome.runtime.lastError.message);
-        } else if (response.status === "error") {
-            console.error("Error:", response.message);
-        } else {
-            console.log("Scraping initiated:", response.message);
-        }
-    });
+  // Show loading animation
+  document.getElementById("loading").style.display = "block";
+  document.getElementById("product-list").innerHTML = ""; // Clear previous results
+
+  chrome.runtime.sendMessage({ action: "scrapeData" }, (response) => {
+    if (chrome.runtime.lastError) {
+      console.error(
+        "Error from background script:",
+        chrome.runtime.lastError.message
+      );
+      document.getElementById("loading").style.display = "none"; // Hide loading animation on error
+    } else if (response.status === "error") {
+      console.error("Error:", response.message);
+      document.getElementById("loading").style.display = "none"; // Hide loading animation on error
+    } else {
+      console.log("Scraping initiated:", response.message);
+      // The loading animation will be hidden when the processed results are received
+    }
+  });
 });
 
 // Listen for processed results
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === "processedResults") {
-        console.log("Processed results received in popup:", message.data);
+  if (message.action === "processedResults") {
+    console.log("Processed results received in popup:", message.data);
 
-        // Display the results in the popup
-        const resultsContainer = document.createElement("div");
-        resultsContainer.style.maxHeight = "400px";
-        resultsContainer.style.overflowY = "auto";
+    // Hide loading animation
+    document.getElementById("loading").style.display = "none";
 
-        message.data.filteredProducts.forEach((product) => {
-            const productDiv = document.createElement("div");
-            productDiv.style.marginBottom = "20px";
-            productDiv.innerHTML = `
-                <p><strong>Name:</strong> ${product.name}</p>
-                <p><strong>Price:</strong> ${product.price}</p>
+    // Display the results in the popup
+    const productList = document.getElementById("product-list");
+    productList.innerHTML = ""; // Clear previous results
+
+    message.data.filteredProducts.forEach((product) => {
+      const productDiv = document.createElement("div");
+      productDiv.className = "product-item";
+      productDiv.innerHTML = `
+                <p class="product-name">${product.name}</p>
+                <p class="product-price">${product.price}</p>
                 <p><strong>Merchant:</strong> ${product.merchant}</p>
                 <p><strong>Delivery:</strong> ${product.freeDelivery}</p>
                 <p><strong>Link:</strong> <a href="${product.link}" target="_blank">View Product</a></p>
                 <img src="${product.image}" alt="${product.name}" width="100">
                 <hr>
             `;
-            resultsContainer.appendChild(productDiv);
-        });
-
-        // Clear previous results and append the new results
-        document.body.innerHTML = ""; // Clear the body for a fresh display
-        document.body.appendChild(resultsContainer);
-    }
+      productList.appendChild(productDiv);
+    });
+  }
 });
