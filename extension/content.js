@@ -1,6 +1,53 @@
 (async () => {
+  const KEY = "VXRmOTdYs70kb4uo5VG0ZsaGU";
+  const scrapEP = "http://api.scraping-bot.io/scrape";
+  const username = "roopu";
+
   console.log("Content script running...");
 
+  const getLinks = () => {
+    const qs = document.getElementsByTagName("textarea")[0].value.split();
+
+    const domlinks = document.links;
+    const links = [];
+    for (let i = 0; i < domlinks.length; i++) {
+      const text = domlinks[i].href;
+      for (let q in qs) {
+        if (text.includes(q) && !text.includes("google")) {
+          links.push(domlinks[i].href);
+          break;
+        }
+      }
+    }
+    return links;
+  };
+
+  const hitLink = async (url) => {
+    try {
+      // Fetch the HTML content
+      const auth =
+        "Basic " + Buffer.from(username + ":" + KEY).toString("base64");
+      const response = await fetch(scrapEP, {
+        method: "POST",
+        body: {
+          url,
+        },
+        headers: {
+          Accept: "application/json",
+          Authorization: auth,
+        },
+      });
+      const data = await JSON.parse(response.body);
+      console.log(data);
+    } catch (error) {
+      console.error("Error fetching or parsing the page:", error);
+    }
+  };
+
+  const links = getLinks();
+  const data = hitLink(links[0]);
+
+  /*
   const getProductElements = () =>
     Array.from(document.querySelectorAll("a[href*='http']"));
 
@@ -31,7 +78,7 @@
       products.push({ name, price, rating, freeDelivery, image, link });
     });
 
-    console.log("Collected products so far:", products.length);
+    // console.log("Collected products so far:", products.length);
 
     // If we haven’t collected enough products, scroll and wait for more content to load
     if (products.length < targetProducts) {
@@ -44,7 +91,7 @@
     attempts++;
   }
 
-  console.log("Final Scraped Products:", JSON.stringify(products, null, 2));
+  //   console.log("Final Scraped Products:", JSON.stringify(products, null, 2));
 
   if (products.length === 0) {
     console.error("No products found. Ensure the page has product elements.");
@@ -87,4 +134,5 @@
   } catch (error) {
     console.error("Error sending data to backend:", error);
   }
+    */
 })();

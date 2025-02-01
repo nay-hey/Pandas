@@ -41,7 +41,7 @@ app.post("/process", async (req, res) => {
         parseFloat(b.price.replace(/[₹$,]/g, "").replace(",", ""))
     );
 
-  console.log("Filtered products:", filteredProducts);
+  //   console.log("Filtered products:", filteredProducts);
 
   res.json({ success: true, filteredProducts });
 });
