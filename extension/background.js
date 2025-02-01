@@ -40,5 +40,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Return true to indicate that the response will be sent asynchronously
         return true;
     }
-    
+    if (message.action === "processedResults") {
+        console.log("Received processed results from content script:", message.data);
+
+        // Optionally send data to the popup or store it
+        sendResponse({ status: "success", message: "Processed results received", data: message.data });
+    }
 });
