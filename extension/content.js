@@ -1,125 +1,131 @@
 (async () => {
-  const KEY = "VXRmOTdYs70kb4uo5VG0ZsaGU";
-  const scrapEP = "http://api.scraping-bot.io/scrape";
-  const username = "roopu";
-
   console.log("Content script running...");
 
-  // Function to get links based on search terms in the textarea
-  const getLinks = () => {
-    const textarea = document.getElementsByTagName("textarea")[0];
-    if (!textarea) {
-      console.error("No textarea found on the page.");
-      return [];
+  // Save the original content of the page
+  const originalHTML = document.body.innerHTML;
+
+  // Select all product items
+  const productItems = document.querySelectorAll(".pla-unit");
+  console.log("Found product items:", productItems);
+
+  // Map through product items and extract details
+  const products = Array.from(productItems).map((item, index) => {
+    console.log(`Processing item ${index + 1}:, item`);
+
+    // Extract name from innerText
+    let name = "No name";
+    const rawText = item.innerText || ""; // Get the full text content of the item
+    if (rawText) {
+      name = rawText.split("\n")[0].trim(); // Extract the first line as the name
     }
 
-    // Split the textarea value into search terms
-    const searchTerms = textarea.value.split(",").map((term) => term.trim());
-    console.log("Search terms:", searchTerms);
+    const price = item.innerText.match(/₹[\d,]+/)?.[0] || "No price";
+    const merchant = item.dataset.dtld || "No merchant";
+    const freeDelivery = item.innerText.includes("Free delivery")
+      ? "Free delivery"
+      : "No free delivery";
+    const image = item.querySelector("img")?.src || "No image";
+    console.log("Item HTML:", item.outerHTML);
 
-    const domlinks = document.links;
-    const links = [];
-    for (let i = 0; i < domlinks.length; i++) {
-      const href = domlinks[i].href;
-      for (let term of searchTerms) {
-        if (href.includes(term) && !href.includes("google")) {
-          links.push(href);
-          break;
+    // Try to find the link using the correct selector (pla-unit)
+    const linkElement = item.querySelector("a");
+    const link = linkElement ? linkElement.getAttribute("href") : "No link";
+
+    console.log("Product link:", link);
+
+    return { name, price, merchant, freeDelivery, image, link };
+  });
+
+  console.log("Scraped Products:", products);
+
+  // Sort the products by price (if available)
+  products.sort((a, b) => {
+    const priceA = a.price.replace(/[₹,]/g, "") || 0;
+    const priceB = b.price.replace(/[₹,]/g, "") || 0;
+    return parseFloat(priceA) - parseFloat(priceB);
+  });
+
+  // Send the scraped data to the backend
+  try {
+    const response = await fetch("http://localhost:3000/process", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ products }),
+    });
+
+    const result = await response.json();
+    console.log("Processed Results:", result);
+    chrome.runtime.sendMessage(
+      { action: "processedResults", data: result },
+      (response) => {
+        if (chrome.runtime.lastError) {
+          console.error(
+            "Error sending processed results to background:",
+            chrome.runtime.lastError.message
+          );
+        } else {
+          console.log(
+            "Processed results sent to background:",
+            response.message
+          );
         }
       }
-    }
-    return links;
-  };
-
-  //   // Function to hit a link using the scraping API
-  //   const hitLink = async (url) => {
-  //     try {
-  //       // Base64 encode the username and API key
-  //       const auth = "Basic " + btoa(`${username}:${KEY}`);
-
-  //       // Send a POST request to the scraping endpoint
-  //       const response = await fetch(scrapEP, {
-  //         method: "POST",
-  //         headers: {
-  //           Accept: "application/json",
-  //           "Content-Type": "application/json",
-  //           Authorization: auth,
-  //         },
-  //         body: JSON.stringify({ url }),
-  //       });
-
-  //       // Parse the response
-  //       const data = await response.json();
-  //       console.log("Scraping API response:", data);
-  //       return data;
-  //     } catch (error) {
-  //       console.error("Error fetching or parsing the page:", error);
-  //       return null;
-  //     }
-  //   };
-
-  // Main logic
-  const links = getLinks();
-  console.log("Found links:", links);
-
-  if (links.length > 0) {
-    const firstLink = links[0];
-    console.log("Hitting first link:", firstLink);
-
-    const data = await hitLink(firstLink);
-    if (data) {
-      console.log("Scraped data:", data);
-
-      // Send the scraped data to the backend for further processing
-      try {
-        const backendResponse = await fetch("http://localhost:3000/process", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ products: [data] }), // Wrap data in an array
-        });
-
-        if (!backendResponse.ok) {
-          throw new Error(`HTTP error! Status: ${backendResponse.status}`);
-        }
-
-        const result = await backendResponse.json();
-        console.log("Backend processed results:", result);
-
-        // Send the processed results to the background script
-        chrome.runtime.sendMessage(
-          { action: "processedResults", data: result },
-          (response) => {
-            if (chrome.runtime.lastError) {
-              console.error(
-                "Error sending processed results to background:",
-                chrome.runtime.lastError.message
-              );
-            } else {
-              console.log(
-                "Processed results sent to background:",
-                response?.message || "No response"
-              );
-            }
-          }
-        );
-      } catch (error) {
-        console.error("Error sending data to backend:", error);
-      }
-    }
-  } else {
-    console.error("No links found matching the search terms.");
+    );
+  } catch (error) {
+    console.error("Error sending data to backend:", error);
   }
+
+  // Dynamically inject HTML content including filters and swiper container
+  document.body.innerHTML = `
+        <!-- Close Button -->
+        <button id="close-injected-content" style="position: absolute; top: 10px; right: 10px; z-index: 1000; background: red; color: white; border: none; padding: 10px; cursor: pointer;">X</button>
+  
+        <!-- Filtering Options -->
+        <div id="filters">
+            <label for="merchant-filter">Merchant:</label>
+            <select id="merchant-filter">
+                <option value="all">All</option>
+                <!-- Additional merchants can be added dynamically -->
+            </select>
+    
+            <label for="price-range">Max Price:</label>
+            <input type="range" id="price-range" min="0" max="2000" step="10" value="2000">
+            <span id="price-value">2000</span>
+    
+            <label>
+                <input type="checkbox" id="free-delivery-filter">
+                Free Delivery Only
+            </label>
+        </div>
+  
+        <!-- Product Cards -->
+        <div class="product-cards" id="product-list" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start;">
+            ${products
+              .map(
+                (product) => `
+              <div class="product-card" style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; width: 200px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;">
+                  <img src="${product.image}" alt="${product.name}" style="width: 100%; height: auto; border-radius: 5px;" />
+                  <h3 style="font-size: 16px; margin: 10px 0; text-align: center;">${product.name}</h3>
+                  <p style="color: green; font-size: 14px; margin: 5px 0;">${product.price}</p>
+                  <p style="font-size: 14px; margin: 5px 0; text-align: center;">Merchant: ${product.merchant}</p>
+                  <p style="font-size: 14px; margin: 5px 0; text-align: center;">${product.freeDelivery}</p>
+                  <a href="${product.link}" target="_blank" style="font-size: 14px; color: blue; text-align: center;">View Product</a>
+              </div>
+          `
+              )
+              .join("")}
+        </div>
+    
+        <script src="popup.js"></script>
+      `;
+
+  // Close button functionality to restore original page content
+  document
+    .getElementById("close-injected-content")
+    ?.addEventListener("click", () => {
+      document.body.innerHTML = originalHTML; // Restore the original HTML
+      console.log("Original page content restored");
+    });
 })();
-document.body.innerHTML = `
-    <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; font-family: Arial, sans-serif;">
-        <h1 style="color: #3498db;">Welcome to the Random EJS Page</h1>
-        <p>This content was dynamically injected using a Chrome extension!</p>
-        <ul style="list-style-type: none;">
-            <li><strong>Random Item 1:</strong> ${Math.random().toFixed(2)}</li>
-            <li><strong>Random Item 2:</strong> ${Math.random().toFixed(2)}</li>
-            <li><strong>Random Item 3:</strong> ${Math.random().toFixed(2)}</li>
-        </ul>
-    </div>
-`;
