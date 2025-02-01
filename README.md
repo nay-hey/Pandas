@@ -39,5 +39,4 @@ We will further use trained AI models to predict and suggest the best time of th
 4. Testing:
     - Open a google chrome tab and search for any item.
     - Click on extensions in the searchbar and select the Price Scraper Extension.
-    - ![Extension1](/Extensions1.png)
     - Now you can filter and view search results from various websites.
