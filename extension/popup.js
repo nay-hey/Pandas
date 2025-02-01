@@ -70,35 +70,22 @@ function displayProducts(products) {
       const productDiv = document.createElement("div");
       productDiv.classList.add("swiper-slide", "product-item");
       productDiv.innerHTML = `
-          <p class="product-name">${product.name}</p>
-          <p class="product-price">Price: ${product.price}</p>
-          <p><strong>Merchant:</strong> ${product.merchant}</p>
-          <p><strong>Delivery:</strong> ${product.freeDelivery}</p>
-          <p><strong>Link:</strong> <a href="${product.link}" target="_blank">View Product</a></p>
-          <img src="${product.image}" alt="${product.name}" width="100">
-      `;
-      productList.appendChild(productDiv);
-  });
+                  <p><strong>Name:</strong> ${product.name}</p>
+                  <p><strong>Price:</strong> ${product.price}</p>
+                  <p><strong>Merchant:</strong> ${product.merchant}</p>
+                  <p><strong>Delivery:</strong> ${product.freeDelivery}</p>
+                  <p><strong>Link:</strong> <a href="${product.link}" target="_blank">View Product</a></p>
+                  <img src="${product.image}" alt="${product.name}" width="100">
+                  <hr>
+              `;
+      resultsContainer.appendChild(productDiv);
+    });
 
-  // Initialize Swiper.js
-  new Swiper(".swiper-container", {
-      slidesPerView: 3,
-      spaceBetween: 20,
-      navigation: { nextEl: ".swiper-button-next", prevEl: ".swiper-button-prev" },
-      pagination: { el: ".swiper-pagination", clickable: true },
-      autoplay: { delay: 3000, disableOnInteraction: false },
-  });
-}
-
-// Event listeners for filtering
-document.getElementById("merchant-filter").addEventListener("change", () => applyFilters(allProducts));
-document.getElementById("price-range").addEventListener("input", function () {
-  document.getElementById("price-value").textContent = this.value;
-  applyFilters(allProducts);
+    // Clear previous results and append the new results
+    document.body.innerHTML = ""; // Clear the body for a fresh display
+    document.body.appendChild(resultsContainer);
+  }
 });
-document.getElementById("free-delivery-filter").addEventListener("change", () => applyFilters(allProducts));
-
-
 document.getElementById("scrape-button").addEventListener("click", () => {
   chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
     chrome.scripting.executeScript({
