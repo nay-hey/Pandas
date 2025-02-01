@@ -47,7 +47,7 @@ node index.js
 2. Click on the *Extensions* icon in the toolbar.
 3. Select the *Price Scraper Extension*.
 4. View and filter search results from multiple websites.
-![Extension Preview](Extension.png)
+![Extension Preview](Extensions.png)
 ---
 
 Enjoy saving money with the Financial Saving Extension! 🚀
