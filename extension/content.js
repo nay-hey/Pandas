@@ -4,13 +4,13 @@
   // Save the original content of the page
   const originalHTML = document.body.innerHTML;
 
-  // Select all product items
+  // Select all product items (Ensure the selector is accurate based on your actual page)
   const productItems = document.querySelectorAll(".pla-unit");
   console.log("Found product items:", productItems);
 
   // Map through product items and extract details
   const products = Array.from(productItems).map((item, index) => {
-    console.log(`Processing item ${index + 1}:, item`);
+    console.log(`Processing item ${index + 1}:`, item);
 
     // Extract name from innerText
     let name = "No name";
@@ -83,7 +83,7 @@
         <button id="close-injected-content" style="position: absolute; top: 10px; right: 10px; z-index: 1000; background: red; color: white; border: none; padding: 10px; cursor: pointer;">X</button>
   
         <!-- Filtering Options -->
-        <div id="filters">
+        <div id="filters" style="display: flex; gap: 15px; flex-wrap: wrap;">
             <label for="merchant-filter">Merchant:</label>
             <select id="merchant-filter">
                 <option value="all">All</option>
@@ -104,7 +104,7 @@
         <div class="product-cards" id="product-list" style="display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start;">
             ${products
               .map(
-                (product) => `
+                (product) => ` 
               <div class="product-card" style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; width: 200px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;">
                   <img src="${product.image}" alt="${product.name}" style="width: 100%; height: auto; border-radius: 5px;" />
                   <h3 style="font-size: 16px; margin: 10px 0; text-align: center;">${product.name}</h3>
@@ -113,7 +113,7 @@
                   <p style="font-size: 14px; margin: 5px 0; text-align: center;">${product.freeDelivery}</p>
                   <a href="${product.link}" target="_blank" style="font-size: 14px; color: blue; text-align: center;">View Product</a>
               </div>
-          `
+            `
               )
               .join("")}
         </div>
@@ -128,4 +128,55 @@
       document.body.innerHTML = originalHTML; // Restore the original HTML
       console.log("Original page content restored");
     });
+
+  // Add event listeners for filtering
+  const merchantFilter = document.getElementById("merchant-filter");
+  const priceRange = document.getElementById("price-range");
+  const priceValue = document.getElementById("price-value");
+  const freeDeliveryFilter = document.getElementById("free-delivery-filter");
+
+  // Update price display
+  priceValue.textContent = priceRange.value;
+
+  // Apply filters dynamically
+  function applyFilters() {
+    const selectedMerchant = merchantFilter.value;
+    const maxPrice = parseFloat(priceRange.value);
+    const freeDeliveryOnly = freeDeliveryFilter.checked;
+
+    const filteredProducts = products.filter((product) => {
+      const productPrice = parseFloat(product.price.replace(/[₹,]/g, ""));
+      return (
+        (selectedMerchant === "all" || product.merchant === selectedMerchant) &&
+        (isNaN(productPrice) || productPrice <= maxPrice) &&
+        (!freeDeliveryOnly || product.freeDelivery === "Free delivery")
+      );
+    });
+
+    // Re-render products after applying filters
+    const productList = document.getElementById("product-list");
+    productList.innerHTML = filteredProducts
+      .map(
+        (product) => `
+        <div class="product-card" style="border: 1px solid #ddd; padding: 20px; border-radius: 8px; width: 200px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center;">
+            <img src="${product.image}" alt="${product.name}" style="width: 100%; height: auto; border-radius: 5px;" />
+            <h3 style="font-size: 16px; margin: 10px 0; text-align: center;">${product.name}</h3>
+            <p style="color: green; font-size: 14px; margin: 5px 0;">${product.price}</p>
+            <p style="font-size: 14px; margin: 5px 0; text-align: center;">Merchant: ${product.merchant}</p>
+            <p style="font-size: 14px; margin: 5px 0; text-align: center;">${product.freeDelivery}</p>
+            <a href="${product.link}" target="_blank" style="font-size: 14px; color: blue; text-align: center;">View Product</a>
+        </div>
+        `
+      )
+      .join("");
+  }
+
+  // Event listeners for filtering
+  merchantFilter.addEventListener("change", applyFilters);
+  priceRange.addEventListener("input", function () {
+    priceValue.textContent = this.value;
+    applyFilters();
+  });
+  freeDeliveryFilter.addEventListener("change", applyFilters);
+
 })();
